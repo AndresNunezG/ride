@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 
+
 class UsersAppConfig(AppConfig):
-    
-    name = 'ride.users'
-    verbose_name = 'Users'
+
+    name = "ride.users"
+    verbose_name = "Users"

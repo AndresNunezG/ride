@@ -56,6 +56,7 @@ Project created with Django [cookiecutter](https://github.com/cookiecutter/cooki
 - Phone number
 - First name
 - Last name
+- is_verified
 
 ### Profile
 
