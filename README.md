@@ -65,6 +65,7 @@ Project created with Django [cookiecutter](https://github.com/cookiecutter/cooki
 - Biography (about me)
 - Rides taken (total)
 - Rides offered (total)
+- Reputation (rank)
 
 ### Member
 
