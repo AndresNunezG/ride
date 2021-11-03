@@ -39,4 +39,4 @@ class Profile(RideModel):
     )
 
     def __str__(self):
-        return self.user
+        return self.user.username
