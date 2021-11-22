@@ -1,16 +1,27 @@
 from django.http import HttpResponse, JsonResponse
+from rest_framework.serializers import Serializer
 
 from ride.circles.models import Circle
 
+# Django rest-framework
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
+# Serializers
+from ride.circles.serializers import CircleSerializer, CreateCircleSerializer
+
+
+@api_view(["GET"])
 def list_circles(request):
-    public_circle = Circle.objects.filter(is_public=True)
-    data = []
-    for circle in public_circle:
-        data.append({
-            'name': circle.name,
-            'slug_name': circle.slug_name,
-            'verified': circle.verified,
-        })
-    return JsonResponse(data, safe=False)
- 
+    circles = Circle.objects.filter(is_public=True)
+    serializer = CircleSerializer(circles, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+def create_circle(request):
+    serializer = CreateCircleSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.data
+    circle = Circle.objects.create(**data)
+    return Response(CircleSerializer(circle).data)

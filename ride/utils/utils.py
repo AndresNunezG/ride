@@ -9,9 +9,9 @@ def import_csv(file):
     to be included in the database
     """
     str_to_bool = lambda a: True if int(a) > 0 else False
-    with open(file, 'r') as csv_file:
+    with open(file, "r") as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
-        next(csv_reader) #skip header
+        next(csv_reader)  # skip header
         for row in csv_reader:
             circle = Circle(
                 name=row[0],
