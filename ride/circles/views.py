@@ -1,6 +1,3 @@
-from django.http import HttpResponse, JsonResponse
-from rest_framework.serializers import Serializer
-
 from ride.circles.models import Circle
 
 # Django rest-framework
@@ -22,6 +19,5 @@ def list_circles(request):
 def create_circle(request):
     serializer = CreateCircleSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    data = serializer.data
-    circle = Circle.objects.create(**data)
+    circle = serializer.save()
     return Response(CircleSerializer(circle).data)

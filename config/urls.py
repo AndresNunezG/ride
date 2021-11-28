@@ -9,7 +9,8 @@ urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
-    path("", include(("ride.circles.urls", "circles"), namespace="circle")),
+    path("", include(("ride.circles.urls", "circles"), namespace="circles")),
+    path("", include(("ride.users.urls", "users"), namespace="users")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
