@@ -2,13 +2,13 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ride.users.models import users
 
 # Serializer
 from ride.users.serializers import (
     UserLoginSerializer,
     UserModelSerializer,
     UserSignUpSerializer,
+    AccountVerificationSerializer,
 )
 
 
@@ -30,4 +30,13 @@ class UserSignupAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserModelSerializer(user).data
+        return Response(data, status=status.HTTP_201_CREATED)
+
+
+class AccountVerificationAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = AccountVerificationSerializer(data=request.data)
+        serializer.is_valid()
+        serializer.save()
+        data = {'message': 'Congratulations, now go share some Rides!'}
         return Response(data, status=status.HTTP_201_CREATED)
