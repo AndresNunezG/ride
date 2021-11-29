@@ -1,11 +1,9 @@
-# Models
-from rest_framework import validators
-from ride.circles.models import Circle
-
 # Django rest-framework
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+# Models
+from ride.circles.models import Circle
 
 class CircleSerializer(serializers.Serializer):
 
@@ -26,3 +24,19 @@ class CreateCircleSerializer(serializers.Serializer):
 
     def create(self, data):
         return Circle.objects.create(**data)
+
+class CircleModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Circle
+        fields = (
+            'id',
+            'name',
+            'slug_name',
+            'about',
+            'rides_offered',
+            'rides_taken',
+            'verified',
+            'is_public',
+            'is_limited',
+            'members_limit',
+        )
