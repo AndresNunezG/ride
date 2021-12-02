@@ -141,3 +141,17 @@ class AccountVerificationSerializer(serializers.Serializer):
         user = User.objects.get(username=payload['user'])
         user.is_verified = True
         user.save()
+
+# {
+#     "email": "camilo@nunez.com",
+#     "username": "camilo",
+#     "phone": "3165203926",
+#     "password": "admin1234.",
+#     "password_confirmation": "admin1234.",
+#     "first_name": "camilo",
+#     "last_name": "nunez"
+# }
+
+# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiY2FtaWxvIiwiZXhwIjoxNjM4Njc1NDExLCJ0eXBlIjoiZW1haWxfY29uZmlybWF0aW9uIn0.TJ_dWnjpJeuwbfyVSdDkZIePcsmrXoIL2tycpSGUAYw
+
+# 44b4c6c090683b6c9f81318c045f0c9398b4a39b

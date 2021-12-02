@@ -39,4 +39,4 @@ class AccountVerificationAPIView(APIView):
         serializer.is_valid()
         serializer.save()
         data = {'message': 'Congratulations, now go share some Rides!'}
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(data, status=status.HTTP_200_OK)
