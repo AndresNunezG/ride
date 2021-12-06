@@ -1,6 +1,10 @@
 from django.urls import path
 
-from ride.users.views import UserLoginAPIView, UserSignupAPIView, AccountVerificationAPIView
+from ride.users.views import (
+    UserLoginAPIView,
+    UserSignupAPIView,
+    AccountVerificationAPIView,
+)
 
 urlpatterns = [
     path("users/login/", UserLoginAPIView.as_view(), name="login"),
