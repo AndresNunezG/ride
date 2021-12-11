@@ -33,7 +33,7 @@ class CircleModelSerializer(serializers.ModelSerializer):
         required=False, min_value=10, max_value=32000
     )
 
-    is_limit = serializers.BooleanField(default=False)
+    is_limited = serializers.BooleanField(default=False)
 
     class Meta:
         model = Circle
@@ -47,7 +47,6 @@ class CircleModelSerializer(serializers.ModelSerializer):
             "is_public",
             "is_limited",
             "members_limit",
-            "is_limit",
         )
         read_only_fields = (
             "is_public",

@@ -17,17 +17,20 @@ from rest_framework.validators import UniqueValidator
 # Models
 from ride.users.models import User, Profile
 
+class ProfileModelSerializer(serializers.ModelSerializer):
+    """Profile modal serializer"""
+
+    class Meta:
+        model = Profile
+        fields = ("picture", "biography", "rides_taken", "rides_offered", "reputation")
+        read_only_fields = ("rides_taken", "rides_offered", "reputation")
 
 class UserModelSerializer(serializers.ModelSerializer):
+    profile = ProfileModelSerializer(read_only=True)
+
     class Meta:
         model = User
-        fields = (
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "phone",
-        )
+        fields = ("username", "first_name", "last_name", "email", "phone", "profile")
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -145,7 +148,6 @@ class AccountVerificationSerializer(serializers.Serializer):
         user.is_verified = True
         user.save()
 
-
 # {
 #     "email": "camilo@nunez.com",
 #     "username": "camilo",
@@ -159,3 +161,5 @@ class AccountVerificationSerializer(serializers.Serializer):
 # eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiY2FtaWxvIiwiZXhwIjoxNjM4Njc1NDExLCJ0eXBlIjoiZW1haWxfY29uZmlybWF0aW9uIn0.TJ_dWnjpJeuwbfyVSdDkZIePcsmrXoIL2tycpSGUAYw
 
 # 44b4c6c090683b6c9f81318c045f0c9398b4a39b
+
+# http -f PATCH localhost:8000/users/camsky/profile/ picture@/Users/andresnunez/Downloads/picture.png "Authorization: Token 44b4c6c090683b6c9f81318c045f0c9398b4a39b" -b
