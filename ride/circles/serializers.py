@@ -38,7 +38,6 @@ class CircleModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Circle
         fields = (
-            "id",
             "name",
             "slug_name",
             "about",
@@ -48,6 +47,7 @@ class CircleModelSerializer(serializers.ModelSerializer):
             "is_public",
             "is_limited",
             "members_limit",
+            "is_limit",
         )
         read_only_fields = (
             "is_public",
