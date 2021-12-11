@@ -3,7 +3,10 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 # Models
-from ride.circles.models import Circle
+from ride.circles.models import Circle, Membership
+
+# Serializer
+from ride.users.serializers import UserModelSerializer
 
 
 class CircleSerializer(serializers.Serializer):
@@ -63,3 +66,32 @@ class CircleModelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "If circles is limited, a member list must be provided"
             )
+
+
+class MembershipSerializer(serializers.ModelSerializer):
+    """Member model serializer"""
+
+    user = UserModelSerializer(read_only=True)
+    invited_by = serializers.StringRelatedField()
+    joined_at = serializers.DateTimeField(source='created', read_only=True)
+
+    class Meta:
+        model = Membership
+        fields = (
+            'user',
+            'is_admin',
+            'is_active',
+            'used_invitations',
+            'remaining_invitations',
+            'invited_by',
+            'rides_taken',
+            'rides_offered',
+            'joined_at'
+        )
+        read_only_fields = (
+            'user',
+            'used_invitations',
+            'invited_by',
+            'rides_taken',
+            'rides_offered'
+        )

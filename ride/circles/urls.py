@@ -1,6 +1,5 @@
 # Django
 from django.urls import path, include
-from rest_framework import routers
 
 # from ride.circles.views import list_circles, create_circle
 
@@ -9,6 +8,7 @@ from rest_framework.routers import DefaultRouter
 
 # Views
 from .views import circles as circle_views
+from .views import memberships as membership_views
 
 # urlpatterns = [
 #     path("circles/", list_circles),
@@ -17,5 +17,6 @@ from .views import circles as circle_views
 
 router = DefaultRouter()
 router.register(r"circles", circle_views.CircleViewSet, basename="circle")
+router.register(r"circles/(?P<slug_name>[a-zA-Z0-9_-]+)/members", membership_views.MembershipViewSet, basename="membership")
 
 urlpatterns = [path("", include(router.urls))]
