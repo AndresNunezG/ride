@@ -18,7 +18,7 @@ from ride.users.serializers import (
     UserModelSerializer,
     UserSignUpSerializer,
     AccountVerificationSerializer,
-    ProfileModelSerializer
+    ProfileModelSerializer,
 )
 from ride.circles.serializers import CircleModelSerializer
 

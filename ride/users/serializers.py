@@ -17,6 +17,7 @@ from rest_framework.validators import UniqueValidator
 # Models
 from ride.users.models import User, Profile
 
+
 class ProfileModelSerializer(serializers.ModelSerializer):
     """Profile modal serializer"""
 
@@ -24,6 +25,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ("picture", "biography", "rides_taken", "rides_offered", "reputation")
         read_only_fields = ("rides_taken", "rides_offered", "reputation")
+
 
 class UserModelSerializer(serializers.ModelSerializer):
     profile = ProfileModelSerializer(read_only=True)
@@ -147,6 +149,7 @@ class AccountVerificationSerializer(serializers.Serializer):
         user = User.objects.get(username=payload["user"])
         user.is_verified = True
         user.save()
+
 
 # {
 #     "email": "camilo@nunez.com",
