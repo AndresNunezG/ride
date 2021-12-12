@@ -1,2 +1,2 @@
 from .circles import IsCircleAdmin
-from .memberships import IsActiveCircleMember
+from .memberships import IsActiveCircleMember, IsAdminOrMembershipOwner

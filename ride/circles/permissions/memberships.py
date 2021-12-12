@@ -2,7 +2,7 @@
 from rest_framework.permissions import BasePermission
 
 # Models
-from ride.circles.models import Membership
+from ride.circles.models import Membership, memberships
 
 
 class IsActiveCircleMember(BasePermission):
@@ -16,6 +16,22 @@ class IsActiveCircleMember(BasePermission):
         try:
             Membership.objects.get(
                 user=request.user, circle=view.circle, is_active=True
+            )
+        except Membership.DoesNotExist:
+            return False
+        return True
+
+
+class IsAdminOrMembershipOwner(BasePermission):
+    """Allow access only to circle admin or users that are owner of the membership"""
+
+    def has_permission(self, request, view):
+        membership = view.get_object()
+        if membership.user == request.user:
+            return True
+        try:
+            Membership.objects.get(
+                circle=view.circle, user=request.user, is_active=True, is_admin=True
             )
         except Membership.DoesNotExist:
             return False

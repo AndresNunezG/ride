@@ -12,6 +12,7 @@ from ride.circles.serializers import MembershipSerializer
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from ride.circles.permissions import IsActiveCircleMember
+from ride.circles.permissions.memberships import IsAdminOrMembershipOwner
 
 
 class MembershipViewSet(
@@ -32,8 +33,9 @@ class MembershipViewSet(
 
     def get_permissions(self):
         """Assign permissions based on action"""
-
         permissions = [IsAuthenticated, IsActiveCircleMember]
+        if self.action in ["destroy"]:
+            permissions.append(IsAdminOrMembershipOwner)
         return [p() for p in permissions]
 
     def get_queryset(self):
