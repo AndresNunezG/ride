@@ -1,10 +1,11 @@
 # Django REST framework
 from rest_framework import mixins, viewsets
 from rest_framework.generics import get_object_or_404
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 # Models
-from ride.circles.models import Circle
-from ride.circles.models.memberships import Membership
+from ride.circles.models import Circle, Membership, Invitation
 
 # Serializers
 from ride.circles.serializers import MembershipSerializer
@@ -44,7 +45,6 @@ class MembershipViewSet(
 
     def get_object(self):
         """Return the circle member by using the user's username"""
-        # import pdb; pdb.set_trace()
         return get_object_or_404(
             Membership,
             user__username=self.kwargs["pk"],
@@ -56,3 +56,130 @@ class MembershipViewSet(
         """Disable membership"""
         instance.is_active = False
         instance.save()
+
+    @action(detail=True, methods=["get"])
+    def invitations(self, request, *args, **kwargs):
+        """Retrieve a member's invitations breakdown
+        Will return a list containing all the members that have
+        used its invitations and another list containing the
+        invitations that haven't being used yet.
+        """
+        member = self.get_object()
+        invited_members = Membership.objects.filter(
+            circle=self.circle, invited_by=request.user, is_active=True
+        )
+
+
+        unused_invitations = Invitation.objects.filter(
+            circle=self.circle,
+            issued_by=request.user,
+            used=False,
+        ).values_list('code')
+
+        diff = member.remaining_invitations - len(unused_invitations)
+
+        invitations = [invitation[0] for invitation in unused_invitations]
+        for _ in range(0, diff):
+            invitations.append(
+                Invitation.objects.create(
+                    issued_by=request.user,
+                    circle=self.circle
+                ).code
+            )
+
+        data = {
+            "used_invitations": MembershipSerializer(invited_members, many=True).data,
+            "invitations": invitations
+        }
+
+        return Response(data)
+
+
+# // circles/<circle_lug_name>/members/
+
+# {
+#   "count": 2,
+#   "next": null,
+#   "previous": null,
+#   "results": [
+#     {
+#       "user": {
+#         "username": "camilo",
+#         "first_name": "camilo",
+#         "last_name": "nunez",
+#         "email": "camilo@nunez.com",
+#         "phone": "1234567890",
+#         "profile": {
+#           "picture": null,
+#           "biography": "",
+#           "rides_taken": 0,
+#           "rides_offered": 0,
+#           "reputation": 5
+#         }
+#       },
+#       "is_admin": false,
+#       "is_active": true,
+#       "used_invitations": 0,
+#       "remaining_invitations": 0,
+#       "invited_by": "camsky",
+#       "rides_taken": 0,
+#       "rides_offered": 0,
+#       "joined_at": "2021-12-15T03:31:14.987923Z"
+#     },
+#     {
+#       "user": {
+#         "username": "camsky",
+#         "first_name": "camilo",
+#         "last_name": "nunez",
+#         "email": "camsky@camsky.com",
+#         "phone": "3165203926",
+#         "profile": {
+#           "picture": "http://localhost:8000/media/users/pictures/camilo.png",
+#           "biography": "Enginner",
+#           "rides_taken": 0,
+#           "rides_offered": 0,
+#           "reputation": 5
+#         }
+#       },
+#       "is_admin": true,
+#       "is_active": true,
+#       "used_invitations": 0,
+#       "remaining_invitations": 10,
+#       "invited_by": null,
+#       "rides_taken": 0,
+#       "rides_offered": 0,
+#       "joined_at": "2021-12-05T17:26:49.194603Z"
+#     }
+#   ]
+# }
+
+# // circles/<circle_lug_name>/members/camsky/invitations/
+
+# {
+#   "used_invitations": [
+#     {
+#       "user": {
+#         "username": "camilo",
+#         "first_name": "camilo",
+#         "last_name": "nunez",
+#         "email": "camilo@nunez.com",
+#         "phone": "1234567890",
+#         "profile": {
+#           "picture": null,
+#           "biography": "",
+#           "rides_taken": 0,
+#           "rides_offered": 0,
+#           "reputation": 5
+#         }
+#       },
+#       "is_admin": false,
+#       "is_active": true,
+#       "used_invitations": 0,
+#       "remaining_invitations": 0,
+#       "invited_by": "camsky",
+#       "rides_taken": 0,
+#       "rides_offered": 0,
+#       "joined_at": "2021-12-15T03:31:14.987923Z"
+#     }
+#   ]
+# }

@@ -166,3 +166,65 @@ class AccountVerificationSerializer(serializers.Serializer):
 # 44b4c6c090683b6c9f81318c045f0c9398b4a39b
 
 # http -f PATCH localhost:8000/users/camsky/profile/ picture@/Users/andresnunez/Downloads/picture.png "Authorization: Token 44b4c6c090683b6c9f81318c045f0c9398b4a39b" -b
+
+# // SIGNUP
+
+# // Body request:
+# {
+#     "email": "camilo@nunez.com",
+#     "username": "camilo",
+#     "phone": "1234567890",
+#     "password": "admin.123",
+#     "password_confirmation": "admin.123",
+#     "first_name": "camilo",
+#     "last_name": "nunez"
+# }
+
+# // Response 201 Created:
+# {
+#   "username": "camilo",
+#   "first_name": "camilo",
+#   "last_name": "nunez",
+#   "email": "camilo@nunez.com",
+#   "phone": "1234567890",
+#   "profile": {
+#     "picture": null,
+#     "biography": "",
+#     "rides_taken": 0,
+#     "rides_offered": 0,
+#     "reputation": 5
+#   }
+# }
+
+# // ACCOUNT VERIFICATION
+
+# // Body request:
+# {
+#     "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiY2FtaWxvIiwiZXhwIjoxNjM5Nzk2MjYxLCJ0eXBlIjoiZW1haWxfY29uZmlybWF0aW9uIn0.nHyUYlVEYOnpFO-j_qcr0nmKLZUCL56C4-mzir7bMnA"
+# }
+
+# // Response 200 OK
+# {
+#   "message": "Congratulations, now go share some Rides!"
+# }
+
+# // LOGIN
+
+# // Responde 201 Created
+# {
+#   "user": {
+#     "username": "camilo",
+#     "first_name": "camilo",
+#     "last_name": "nunez",
+#     "email": "camilo@nunez.com",
+#     "phone": "1234567890",
+#     "profile": {
+#       "picture": null,
+#       "biography": "",
+#       "rides_taken": 0,
+#       "rides_offered": 0,
+#       "reputation": 5
+#     }
+#   },
+#   "access_token": "0a823d3a97079e01b1cac388847e090f5c9392e0"
+# }
