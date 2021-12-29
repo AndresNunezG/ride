@@ -11,6 +11,7 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     path("", include(("ride.circles.urls", "circles"), namespace="circles")),
     path("", include(("ride.users.urls", "users"), namespace="users")),
+    path("", include(("ride.rides.urls", "rides"), namespace="rides")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
