@@ -5,7 +5,6 @@ from django.utils import timezone
 
 # Django Rest Framework
 from rest_framework import serializers
-from ride.circles.models import memberships
 
 # Models
 from ride.rides.models import Ride
@@ -106,4 +105,58 @@ class CreateRideSerializer(serializers.ModelSerializer):
 #   "departure_date": "2021-12-29T22:00:00Z",
 #   "arrival_location": "calle 170",
 #   "arrival_date": "2021-12-29T22:30:00Z"
+# }
+
+
+class RideModelSerializer(serializers.ModelSerializer):
+    """Ride model serializer"""
+
+    class Meta:
+        """Meta class"""
+
+        model = Ride
+        fields = "__all__"
+        read_only_fields = ("offered_in", "offered_by", "is_active")
+
+
+# GET request to {{host}}/circles/pycol/rides/?search=170
+# RESPONSE
+# {
+#   "count": 2,
+#   "next": null,
+#   "previous": null,
+#   "results": [
+#     {
+#       "id": 1,
+#       "created": "2021-12-29T21:28:45.272227Z",
+#       "modified": "2021-12-29T21:28:45.272248Z",
+#       "available_seats": 3,
+#       "comments": "",
+#       "departure_location": "calle 140",
+#       "departure_date": "2021-12-29T22:00:00Z",
+#       "arrival_location": "calle 170",
+#       "arrival_date": "2021-12-29T22:30:00Z",
+#       "rating": null,
+#       "is_active": true,
+#       "offered_by": 9,
+#       "offered_in": 25,
+#       "passengers": []
+#     },
+#     {
+#       "id": 2,
+#       "created": "2021-12-29T22:26:57.292316Z",
+#       "modified": "2021-12-29T22:26:57.292340Z",
+#       "available_seats": 3,
+#       "comments": "",
+#       "departure_location": "calle 140",
+#       "departure_date": "2021-12-29T22:30:00Z",
+#       "arrival_location": "calle 170",
+#       "arrival_date": "2021-12-29T23:00:00Z",
+#       "rating": null,
+#       "is_active": true,
+#       "offered_by": 9,
+#       "offered_in": 25,
+#       "passengers": []
+#     }
+#   ]
 # }
