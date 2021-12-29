@@ -1,9 +1,14 @@
 # Django REST Framework
 from rest_framework import viewsets
+from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 
 # Permissions
 from ride.circles.permissions import IsCircleAdmin
+
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Serializers
 from ride.circles.serializers import CircleModelSerializer
@@ -18,6 +23,21 @@ class CircleViewSet(viewsets.ModelViewSet):
 
     serializer_class = CircleModelSerializer
     lookup_field = "slug_name"
+
+    # Filters
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ("slug_name", "name")
+    filter_fields = ("verified", "is_limited")
+    ordering_fields = (
+        "rides_offered",
+        "rides_taken",
+        "name",
+        "creater",
+        "members_limit",
+    )
+    ordering = ("-members__count", "-rides_offered", "-rides_taken")
+
+    # {{host}}/circles/?verified=1&limit=10&ordering=name&search=UNAM&is_limited=false
 
     def get_queryset(self):
         queryset = Circle.objects.all()
