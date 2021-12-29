@@ -8,7 +8,8 @@ from ride.circles.permissions import IsCircleAdmin
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
+
+# from django_filters.rest_framework import DjangoFilterBackend
 
 # Serializers
 from ride.circles.serializers import CircleModelSerializer
@@ -25,7 +26,7 @@ class CircleViewSet(viewsets.ModelViewSet):
     lookup_field = "slug_name"
 
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ("slug_name", "name")
     filter_fields = ("verified", "is_limited")
     ordering_fields = (

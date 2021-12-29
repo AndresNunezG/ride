@@ -80,6 +80,7 @@ LOCAL_APPS = [
     # Your stuff: custom apps go here
     "ride.users.apps.UsersAppConfig",
     "ride.circles.apps.CirclesAppConfig",
+    "ride.rides.apps.RidesAppConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
