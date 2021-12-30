@@ -8,12 +8,14 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from ride.rides import serializers
 
 # Serializers
 from ride.rides.serializers import (
     CreateRideSerializer,
     RideModelSerializer,
     JoinRideSerializer,
+    EndRideSerializer
 )
 
 # Models
@@ -34,6 +36,7 @@ class RideViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin
 ):
     """Rides view set"""
 
@@ -63,6 +66,8 @@ class RideViewSet(
             return CreateRideSerializer
         if self.action in ["update", "partial_update"]:
             return JoinRideSerializer
+        if self.action == "finish":
+            return EndRideSerializer
         return RideModelSerializer
 
     def get_serializer_context(self):
@@ -75,9 +80,11 @@ class RideViewSet(
         """Return active circle's rides"""
         # offset = timezone.now() + timedelta(minutes=15)
         # departure_date__gte=offset,
-        return Ride.objects.filter(
-            is_active=True, available_seats__gte=1, offered_in=self.circle
-        )
+        if self.action != 'finish':
+            return Ride.objects.filter(
+                is_active=True, available_seats__gte=1, offered_in=self.circle
+            )
+        return Ride.objects.all()
 
     @action(detail=True, methods=["post"])
     def join(self, request, *args, **kwargs):
@@ -85,11 +92,27 @@ class RideViewSet(
         # get ride
         ride = self.get_object()
         # partial update in serializer
-        serializer = JoinRideSerializer(
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(
             ride,
             data={"passenger": request.user.pk},
             context={"ride": ride, "circle": self.circle},
             partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        ride = serializer.save()
+        data = RideModelSerializer(ride).data
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def finish(self, request, *args, **kwargs):
+        ride = self.get_object()
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(
+            ride,
+            data={'is_active': False, 'current_time': timezone.now()},
+            context=self.get_serializer_context(),
+            partial=True
         )
         serializer.is_valid(raise_exception=True)
         ride = serializer.save()

@@ -290,3 +290,82 @@ class JoinRideSerializer(serializers.ModelSerializer):
         circle.save()
 
         return ride
+
+# POST request to {{host}}/circles/pycol/rides/1/join/
+# BODY void
+# {
+#   "id": 1,
+#   "offered_by": {
+#     "username": "camilo",
+#     "first_name": "camilo",
+#     "last_name": "nunez",
+#     "email": "camilo@nunez.com",
+#     "phone": "1234567890",
+#     "profile": {
+#       "picture": null,
+#       "biography": "",
+#       "rides_taken": 1,
+#       "rides_offered": 2,
+#       "reputation": 5
+#     }
+#   },
+#   "offered_in": "Python Col",
+#   "passengers": [
+#     {
+#       "username": "camilo",
+#       "first_name": "camilo",
+#       "last_name": "nunez",
+#       "email": "camilo@nunez.com",
+#       "phone": "1234567890",
+#       "profile": {
+#         "picture": null,
+#         "biography": "",
+#         "rides_taken": 1,
+#         "rides_offered": 2,
+#         "reputation": 5
+#       }
+#     },
+#     {
+#       "username": "camsky",
+#       "first_name": "camilo",
+#       "last_name": "nunez",
+#       "email": "camsky@camsky.com",
+#       "phone": "3165203926",
+#       "profile": {
+#         "picture": "/media/users/pictures/camilo.png",
+#         "biography": "Enginner",
+#         "rides_taken": 1,
+#         "rides_offered": 0,
+#         "reputation": 5
+#       }
+#     }
+#   ],
+#   "created": "2021-12-29T21:28:45.272227Z",
+#   "modified": "2021-12-30T16:11:13.008192Z",
+#   "available_seats": 2,
+#   "comments": "ride in Kia car",
+#   "departure_location": "calle 140",
+#   "departure_date": "2021-12-29T22:00:00Z",
+#   "arrival_location": "calle 170",
+#   "arrival_date": "2021-12-29T22:30:00Z",
+#   "rating": null,
+#   "is_active": true
+# }
+
+class EndRideSerializer(serializers.ModelSerializer):
+    """End ride serializer"""
+
+    current_time = serializers.DateTimeField()
+
+    class Meta:
+        """Meta class"""
+        
+        model = Ride
+        fields = ('is_active', 'current_time')
+    
+    def validate_current_time(self, data):
+        """Verify ride have indeed started"""
+        ride = self.context['view'].get_object()
+        if data <= ride.departure_date:
+            raise serializers.ValidationError("Ride has not started  yet")
+        return data
