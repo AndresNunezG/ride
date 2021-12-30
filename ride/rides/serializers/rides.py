@@ -9,6 +9,10 @@ from rest_framework import serializers
 # Models
 from ride.rides.models import Ride
 from ride.circles.models.memberships import Membership
+from ride.users.models import User
+
+# Serializers
+from ride.users.serializers import UserModelSerializer
 
 
 class CreateRideSerializer(serializers.ModelSerializer):
@@ -111,12 +115,24 @@ class CreateRideSerializer(serializers.ModelSerializer):
 class RideModelSerializer(serializers.ModelSerializer):
     """Ride model serializer"""
 
+    offered_by = UserModelSerializer(read_only=True)
+    offered_in = serializers.StringRelatedField()
+
+    passengers = UserModelSerializer(read_only=True, many=True)
+
     class Meta:
         """Meta class"""
 
         model = Ride
         fields = "__all__"
         read_only_fields = ("offered_in", "offered_by", "is_active")
+
+    def update(self, instance, validated_data):
+        """Allow updates only before departure date"""
+        now = timezone.now()
+        if instance.departure_date <= now:
+            raise serializers.ValidationError("Ongoing rides cannot be modified")
+        return super(RideModelSerializer, self).update(instance, validated_data)
 
 
 # GET request to {{host}}/circles/pycol/rides/?search=170
@@ -160,3 +176,117 @@ class RideModelSerializer(serializers.ModelSerializer):
 #     }
 #   ]
 # }
+
+# PATCH request to {{host}}/circles/pycol/rides/1/
+# Body
+# {
+#     "comments": "ride in Kia car"
+# }
+# RESPONSE
+# {
+#   "id": 1,
+#   "offered_by": {
+#     "username": "camilo",
+#     "first_name": "camilo",
+#     "last_name": "nunez",
+#     "email": "camilo@nunez.com",
+#     "phone": "1234567890",
+#     "profile": {
+#       "picture": null,
+#       "biography": "",
+#       "rides_taken": 0,
+#       "rides_offered": 2,
+#       "reputation": 5
+#     }
+#   },
+#   "offered_in": "Python Col",
+#   "passengers": [],
+#   "created": "2021-12-29T21:28:45.272227Z",
+#   "modified": "2021-12-30T16:11:13.008192Z",
+#   "available_seats": 3,
+#   "comments": "ride in Kia car",
+#   "departure_location": "calle 140",
+#   "departure_date": "2021-12-29T22:00:00Z",
+#   "arrival_location": "calle 170",
+#   "arrival_date": "2021-12-29T22:30:00Z",
+#   "rating": null,
+#   "is_active": true
+# }
+
+
+class JoinRideSerializer(serializers.ModelSerializer):
+    """Join ride serializer"""
+
+    passenger = serializers.IntegerField()
+
+    class Meta:
+        """Meta class"""
+
+        model = Ride
+        fields = ("passenger",)
+
+    def validate_passenger(self, data):
+        """Verify passenger exists and is a circle member"""
+        try:
+            user = User.objects.get(pk=data)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid passenger")
+
+        circle = self.context["circle"]
+        # if not Membership.object.filter(
+        #     user=user, circle=circle, is_active=True
+        # ).exists():
+        #     raise serializers.ValidationError("Invalid passenger")
+        try:
+            membership = Membership.objects.get(
+                user=user, circle=circle, is_active=True
+            )
+        except Membership.DoesNotExist:
+            raise serializers.ValidationError(
+                "User is not an active member of the circle"
+            )
+
+        # user and membership to be used in update method
+        self.context["user"] = user
+        self.context["membership"] = membership
+        return data
+
+    def validate(self, data):
+        """Verify rides allow new passengers"""
+
+        ride = self.context["ride"]
+        if ride.available_seats < 1:
+            raise serializers.ValidationError("Ride is already full")
+
+        if Ride.objects.filter(passengers__pk=data["passenger"]).exists():
+            raise serializers.ValidationError("Passenger already in this trip")
+
+        return data
+
+    def update(self, instance, data):
+        """Add passenger to ride, and update stats"""
+        ride = self.context["ride"]
+        user = self.context["user"]
+        circle = self.context["circle"]
+
+        # Add passenger to ride
+        ride.passengers.add(user)
+        # Decrease available seats
+        ride.available_seats -= 1
+
+        # User stats
+        profile = user.profile
+        profile.rides_taken += 1
+        profile.save()
+
+        # Membership
+        membership = self.context["membership"]
+        membership.rides_taken += 1
+        membership.save()
+
+        # Circle
+        circle = self.context["circle"]
+        circle.rides_taken += 1
+        circle.save()
+
+        return ride
