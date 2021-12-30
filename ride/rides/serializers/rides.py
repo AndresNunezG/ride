@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 # Models
-from ride.rides.models import Ride
+from ride.rides.models import Ride, Rating
 from ride.circles.models.memberships import Membership
 from ride.users.models import User
 
@@ -291,6 +291,7 @@ class JoinRideSerializer(serializers.ModelSerializer):
 
         return ride
 
+
 # POST request to {{host}}/circles/pycol/rides/1/join/
 # BODY void
 # {
@@ -352,6 +353,7 @@ class JoinRideSerializer(serializers.ModelSerializer):
 #   "is_active": true
 # }
 
+
 class EndRideSerializer(serializers.ModelSerializer):
     """End ride serializer"""
 
@@ -359,13 +361,13 @@ class EndRideSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
-        
+
         model = Ride
-        fields = ('is_active', 'current_time')
-    
+        fields = ("is_active", "current_time")
+
     def validate_current_time(self, data):
         """Verify ride have indeed started"""
-        ride = self.context['view'].get_object()
+        ride = self.context["view"].get_object()
         if data <= ride.departure_date:
             raise serializers.ValidationError("Ride has not started  yet")
         return data
