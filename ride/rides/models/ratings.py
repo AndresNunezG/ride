@@ -2,7 +2,7 @@
 from django.db import models
 
 # Models
-from utils.models import RideModel
+from ride.utils.models import RideModel
 
 
 class Rating(RideModel):
